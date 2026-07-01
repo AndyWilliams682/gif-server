@@ -28,12 +28,24 @@ async fn serve_page(Path(gif_name): Path<String>) -> impl IntoResponse {
         return (StatusCode::NOT_FOUND, "Resource Missing").into_response();
     }
 
-    // Compile type-safe HTML strings natively at runtime
+    // Compile type-safe HTML strings natively at runtime with Open Graph metadata
     let html_page = html! {
         (maud::DOCTYPE)
         html {
             head {
                 title { (gif_name) }
+                
+                // 1. Tell Discord this page hosts a rich video/image asset
+                meta property="og:type" content="video.other"; 
+                
+                // 2. Give Discord the DIRECT, absolute URL to the raw GIF file
+                // Replace "gifs.ampersan.de" with your exact subdomain/domain setup
+                meta property="og:image" content=(format!("https://gifs.ampersan.de/raw/{}.gif", gif_name));
+                
+                // 3. Optimize the layout size for large media blocks on Discord/Twitter
+                meta name="twitter:card" content="summary_large_image";
+                meta property="og:image:type" content="image/gif";
+
                 style { "body { margin:0; background:#0b0b0b; display:flex; justify-content:center; align-items:center; height:100vh; } img { max-width:100%; max-height:100vh; object-fit:contain; }" }
             }
             body {
@@ -41,9 +53,6 @@ async fn serve_page(Path(gif_name): Path<String>) -> impl IntoResponse {
             }
         }
     };
-
-    Html(html_page.into_string()).into_response()
-}
 
 async fn build_gallery() -> impl IntoResponse {
     // Read the mount directly on request, making addition of new files instantaneous
