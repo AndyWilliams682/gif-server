@@ -49,7 +49,7 @@ async fn serve_page(Path(gif_name): Path<String>) -> impl IntoResponse {
                 style { "body { margin:0; background:#0b0b0b; display:flex; justify-content:center; align-items:center; height:100vh; } img { max-width:100%; max-height:100vh; object-fit:contain; }" }
             }
             body {
-                img src=(format!("/raw/{}.gif", gif_name)) alt=(gif_name);
+                img src=(format!("/raw/{}.gif", gif_name)) alt=(gif_name)
             }
         }
     };
